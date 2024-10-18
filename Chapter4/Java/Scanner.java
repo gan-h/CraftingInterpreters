@@ -3,6 +3,8 @@ package Java;
 import java.util.ArrayList;
 import java.util.List;
 import static Java.TokenType.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Scanner {
     private final String source; 
@@ -60,12 +62,118 @@ public class Scanner {
                     addToken(SLASH);
                 }
                 break;
-            case '\"':
-                
+            case '"':
+                string();
                 break;
-                
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+                number();
+                break;
             default:
+                if (isAlpha(c)) {
+                    identifier();
+                    break;
+                }
                 Lox.error(line, "Unexpected character.");
+        }
+    }
+
+    private static final Map<String, TokenType> keywords;
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false", FALSE);
+        keywords.put("for", FOR);
+        keywords.put("fun", FUN);
+        keywords.put("if", IF);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print", PRINT);
+        keywords.put("return", RETURN);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
+    }
+
+
+    private void identifier() {
+        // Precondition: we munched a letter already
+        while(isAlphaNumeric(peek())) {
+            advance();
+        }
+        String identifier_string = source.substring(start, current);
+        if (keywords.get(identifier_string) == null) {
+            addToken(IDENTIFIER, identifier_string);
+        } else {
+            addToken(keywords.get(identifier_string));
+        }
+    }
+
+    private boolean isAlphaNumeric(char c) {
+        return isAlpha(c) || isDigit(c);
+    }
+
+    private boolean isAlpha(char c) {
+        return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || c == '_';
+    }
+
+    private boolean isDigit(char c) {
+        return '9' >= c && c >= '0';
+    }
+    private void number() {
+        boolean periodSeen = false;
+        int trailingDecimals = 0;
+        while (true) {
+            if (isDigit((peek()))) {
+                trailingDecimals += periodSeen ? 1 : 0;
+                advance();
+            } else if (peek() == '.') {
+                if (periodSeen) {
+                    Lox.error(line, "Double period");
+                    advance();
+                    return;
+                } else {
+                    periodSeen = true;
+                    advance();
+                }
+            } else {
+                if (periodSeen && trailingDecimals == 0) {
+                    Lox.error(line, "You used a period in a number literal, but didn't add extra numbers after the period.");
+                    return;
+                }
+                addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+                return;
+            } 
+        }
+    }
+
+    private void string() {
+        // Precondition: We have consumed 1 quotation mark and current is set to the index after the quotation mark
+        // Postcondition: We have consumed everything in the string literal
+        
+        while(peek() != '"' && !isAtEnd()) {
+            advance();
+        }
+
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string.");
+            return;
+        } else {
+            // Quotation mark
+            advance();
+            addToken(STRING, source.substring(start+1, current-1));
         }
     }
 
@@ -75,6 +183,7 @@ public class Scanner {
     }
 
     private boolean match(char expected) {
+        // Initial condition: the code from [start, current) is being parsed
         if (isAtEnd()) return false;
         if (source.charAt(current) != expected) return false;
         current++;
@@ -91,6 +200,9 @@ public class Scanner {
     }
 
     List<Token> scanTokens() {
+        // Logic: 
+        // Initial Condition: The source code from [0, current) has been parsed already
+        // After scan token: The source code from [0, current) has been parsed already
         while (!isAtEnd()) {
             start = current;
             scanToken();
