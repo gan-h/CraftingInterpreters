@@ -26,8 +26,9 @@ public class Parser {
     private Expr equality() {
         Expr first = comparison();
         while (matchOne(BANG_EQUAL, EQUAL_EQUAL) != null) {
+            Token operator = previous();
             Expr next = comparison();
-            first = new Expr.Binary(first, previous(), next);
+            first = new Expr.Binary(first, operator, next);
         }
         return first;
     }

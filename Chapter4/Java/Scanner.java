@@ -117,7 +117,14 @@ public class Scanner {
         if (keywords.get(identifier_string) == null) {
             addToken(IDENTIFIER, identifier_string);
         } else {
-            addToken(keywords.get(identifier_string));
+            TokenType tokenType = keywords.get(identifier_string);
+            if (tokenType == TRUE) {
+                addToken(tokenType, true);
+            } else if (tokenType == FALSE) {
+                addToken(tokenType, false);
+            } else {
+                addToken(keywords.get(identifier_string));
+            }
         }
     }
 
