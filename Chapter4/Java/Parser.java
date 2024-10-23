@@ -83,7 +83,7 @@ public class Parser {
             if (matchOne(NUMBER, STRING, TRUE, FALSE, NIL) != null) {
                 return new Expr.Literal(previous().literal);
             } else {
-                throw new ParseError("Expected primitive type but got " + getCurrentToken().type + " b", getCurrentToken().line);
+                throw new ParseError("Expected primitive type but got " + getCurrentToken().type + " instead", getCurrentToken().line);
             }
         }
 
