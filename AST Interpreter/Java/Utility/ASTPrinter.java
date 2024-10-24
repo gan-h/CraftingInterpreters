@@ -1,5 +1,7 @@
-package Java;
-import static Java.Expr.*;
+package Java.Utility;
+import static Java.Frontend.Expr.*;
+
+import Java.Frontend.Expr;
 
 public class ASTPrinter implements Visitor<String> {
     String print(Expr expr) {

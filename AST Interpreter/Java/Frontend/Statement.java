@@ -1,5 +1,4 @@
-package Java;
-
+package Java.Frontend;
 
 // program -> statement* EOF
 // statement -> exprStatement | printStatement
@@ -8,22 +7,10 @@ package Java;
 
 public abstract class Statement {
 
-    abstract <R> R accept(Visitor<R> visitor);
-    interface Visitor<R> {
+    public abstract <R> R accept(Visitor<R> visitor);
+    public interface Visitor<R> {
         R visitPrintStatement(PrintStatement p);
         R visitExpressionStatement(ExpressionStatement s);
-        R visitGlobalVariableDeclarationStatement(GlobalVariableDeclarationStatement s);
-    }
-
-    public static class GlobalVariableDeclarationStatement extends Statement {
-        @Override
-        public <R> R accept(Visitor<R> visitor) {
-            return visitor.visitGlobalVariableDeclarationStatement(this);
-        }
-        Expr expression;
-        GlobalVariableDeclarationStatement(Expr expression) {
-            this.expression = expression;
-        }
     }
 
     public static class ExpressionStatement extends Statement {
@@ -31,7 +18,7 @@ public abstract class Statement {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitExpressionStatement(this);
         }
-        Expr expression;
+        public Expr expression;
         ExpressionStatement(Expr expression) {
             this.expression = expression;
         }
@@ -42,7 +29,7 @@ public abstract class Statement {
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitPrintStatement(this);
         }
-        Expr expression;
+        public Expr expression;
         PrintStatement(Expr expression) {
             this.expression = expression;
         }

@@ -1,4 +1,4 @@
-package Java;
+package Java.Frontend.Error;
 
 public class ParseError extends Error {
     public final int lineNumber;

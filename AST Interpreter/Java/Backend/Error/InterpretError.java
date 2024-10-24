@@ -1,11 +1,11 @@
-package Java;
+package Java.Backend.Error;
 
 public class InterpretError extends Error {
-    InterpretError(String message) {
+    public InterpretError(String message) {
         super(message);
     }
 
-    InterpretError() {
+    public InterpretError() {
         super();    
     }
 }

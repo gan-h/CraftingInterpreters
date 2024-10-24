@@ -10,9 +10,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import Java.Backend.Interpreter;
+import Java.Frontend.Statement;
+import Java.Frontend.Token;
+import Java.Frontend.Scanner;
+import Java.Frontend.Parser;
+
 public class Lox {
     static boolean hadError = false;
-    static void error(int line, String message) {
+    public static void error(int line, String message) {
         report(line, "", message);
     }
 

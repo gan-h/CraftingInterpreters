@@ -1,10 +1,13 @@
-package Java;
+package Java.Frontend;
+
+import static Java.Frontend.TokenType.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import static Java.TokenType.*;
 import java.util.HashMap;
 import java.util.Map;
+
+import Java.Lox;
 
 public class Scanner {
     private final String source; 
@@ -206,7 +209,7 @@ public class Scanner {
         tokens.add(new Token(type, text, literal, line));
     }
 
-    List<Token> scanTokens() {
+    public List<Token> scanTokens() {
         // Logic: 
         // Initial Condition: The source code from [0, current) has been parsed already
         // After scan token: The source code from [0, current) has been parsed already

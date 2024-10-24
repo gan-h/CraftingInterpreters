@@ -1,13 +1,16 @@
-package Java;
-import static Java.Expr.*;
+package Java.Backend;
+import static Java.Frontend.Expr.*;
 
 import java.util.List;
 
-import Java.Expr.Binary;
-import Java.Expr.Grouping;
-import Java.Expr.Literal;
-import Java.Expr.Unary;
-import Java.Statement.*;
+import Java.Backend.Error.InterpretError;
+import Java.Frontend.Expr;
+import Java.Frontend.Statement;
+import Java.Frontend.Expr.Binary;
+import Java.Frontend.Expr.Grouping;
+import Java.Frontend.Expr.Literal;
+import Java.Frontend.Expr.Unary;
+import Java.Frontend.Statement.*;
 
 public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void> {
     Object print(Expr expr) {

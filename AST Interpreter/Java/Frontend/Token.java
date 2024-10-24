@@ -1,10 +1,10 @@
-package Java;
+package Java.Frontend;
 
 public class Token {
-    final TokenType type;
-    final String lexeme; // the blob of characters
-    final Object literal;
-    final int line;
+    public final TokenType type;
+    public final String lexeme; // the blob of characters
+    public final Object literal;
+    public final int line;
 
     Token(TokenType type, String lexeme, Object literal, int line) {
         this.type = type;

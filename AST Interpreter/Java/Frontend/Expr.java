@@ -1,20 +1,20 @@
-package Java;
+package Java.Frontend;
 
 abstract public class Expr {
 
-    static interface Visitor<R> {
+    public static interface Visitor<R> {
         R visitBinaryExpr(Binary expr);
         R visitGroupingExpr(Grouping expr);
         R visitLiteralExpr(Literal expr);
         R visitUnaryExpr(Unary expr);
     }
 
-    abstract <R> R accept(Visitor<R> visitor);
+    public abstract <R> R accept(Visitor<R> visitor);
 
-    static class Binary extends Expr {
-        final Expr left;
-        final Token operator;
-        final Expr right;
+    public static class Binary extends Expr {
+        public final Expr left;
+        public final Token operator;
+        public final Expr right;
 
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitBinaryExpr(this);
@@ -27,20 +27,20 @@ abstract public class Expr {
         }
     }
 
-    static class Grouping extends Expr {
+    public static class Grouping extends Expr {
 
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitGroupingExpr(this);
         }
 
-        final Expr expression;
+        public final Expr expression;
         Grouping(Expr expression) {
             this.expression = expression;
         }
     }
 
-    static class Literal extends Expr {
-        final Object value;
+    public static class Literal extends Expr {
+        public final Object value;
 
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitLiteralExpr(this);
@@ -50,9 +50,9 @@ abstract public class Expr {
         }
     }
 
-    static class Unary extends Expr {
-        final Token operator;
-        final Expr right;
+    public static class Unary extends Expr {
+        public final Token operator;
+        public final Expr right;
         public <R> R accept(Visitor<R> visitor) {
             return visitor.visitUnaryExpr(this);
         }

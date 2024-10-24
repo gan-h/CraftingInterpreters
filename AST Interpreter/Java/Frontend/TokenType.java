@@ -1,4 +1,4 @@
-package Java;
+package Java.Frontend;
 
 public enum TokenType {
     // Single-character tokens
