@@ -1,0 +1,2 @@
+print "Hello this is a test program";
+print -(38-5) == -33 == true ;

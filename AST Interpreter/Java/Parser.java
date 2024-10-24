@@ -19,6 +19,11 @@ public class Parser {
     // Parsing a statement can be done with one token of lookahead
     public Statement statement() {
         switch (getCurrentToken().type) {
+            case VAR:
+                current += 1;
+                var globalVariableStatement = 
+                if(!consumeOne(SEMICOLON)) throw new ParseError("Expected semicolon", tokens.get(current).line);
+                return globalVariableStatement;
             case PRINT:
                 current += 1;
                 var printStatement = new PrintStatement(expression());
@@ -31,6 +36,8 @@ public class Parser {
         }
     }
 
+    //Program -> Statement* EOF
+    // Statement -> ExpressionStatement | PrintStatement | GlobalVariableStatement
     public ArrayList<Statement> parseTokens() {
         ArrayList<Statement> statements = new ArrayList<Statement>();
         while(!isAtEnd()) {

@@ -12,6 +12,18 @@ public abstract class Statement {
     interface Visitor<R> {
         R visitPrintStatement(PrintStatement p);
         R visitExpressionStatement(ExpressionStatement s);
+        R visitGlobalVariableDeclarationStatement(GlobalVariableDeclarationStatement s);
+    }
+
+    public static class GlobalVariableDeclarationStatement extends Statement {
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitGlobalVariableDeclarationStatement(this);
+        }
+        Expr expression;
+        GlobalVariableDeclarationStatement(Expr expression) {
+            this.expression = expression;
+        }
     }
 
     public static class ExpressionStatement extends Statement {
