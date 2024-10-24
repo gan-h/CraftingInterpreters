@@ -32,9 +32,11 @@ public class Lox {
     static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-        Expr ast = (new Parser(tokens)).parseTokens();
-        System.out.println(ast.accept(new ASTPrinter()));
-        System.out.println(ast.accept(new Interpreter()));
+        List<Statement> ast = (new Parser(tokens)).parseTokens();
+        var interpreter = new Interpreter();
+        for (Statement s : ast) {
+            s.accept(interpreter);
+        }
     }
 
     static void runPrompt() throws IOException {

@@ -1,15 +1,51 @@
 package Java;
 import static Java.Expr.*;
 
+import java.util.List;
+
 import Java.Expr.Binary;
 import Java.Expr.Grouping;
 import Java.Expr.Literal;
 import Java.Expr.Unary;
-import Java.Expr.Visitor;
+import Java.Statement.*;
 
-public class Interpreter implements Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void> {
     Object print(Expr expr) {
         return expr.accept(this);
+    }
+
+    @Override
+    public Void visitPrintStatement(PrintStatement p) {
+        System.out.println(stringify(evaluate(p.expression)));
+        return null;
+    }
+
+    @Override
+    public Void visitExpressionStatement(ExpressionStatement s) {
+        evaluate(s.expression);
+        return null;
+    }
+
+    private String stringify(Object object) {
+        if (object == null) return "nil";
+        if (object instanceof Double) {
+        String text = object.toString();
+        if (text.endsWith(".0")) {
+            text = text.substring(0, text.length() - 2);
+            }
+            return text;
+        }
+        return object.toString();
+    }
+
+    public void evaluate(List<Statement> statements) {
+        for (Statement s : statements) {
+            evaluate(s);
+        }
+    }
+
+    public void evaluate(Statement expr) {
+        expr.accept(this);
     }
 
     public Object evaluate(Expr expr) {
