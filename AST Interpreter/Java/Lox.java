@@ -35,11 +35,11 @@ public class Lox {
         
     }
 
+    private static Interpreter interpreter = new Interpreter();
     static void run(String source) {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
-        List<Statement> ast = (new Parser(tokens)).parseTokens();
-        var interpreter = new Interpreter();
+        List<Statement> ast = (new Parser(tokens)).parseProgram();
         for (Statement s : ast) {
             s.accept(interpreter);
         }

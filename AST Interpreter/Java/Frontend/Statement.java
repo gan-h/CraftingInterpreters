@@ -11,6 +11,24 @@ public abstract class Statement {
     public interface Visitor<R> {
         R visitPrintStatement(PrintStatement p);
         R visitExpressionStatement(ExpressionStatement s);
+        R visitVariableDeclaration(VariableDeclaration s);
+    }
+
+    public static class VariableDeclaration extends Statement {
+
+        public Token name; 
+        public Expr initializer;
+
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVariableDeclaration(this);
+        }
+
+        public VariableDeclaration(Token name, Expr initializer) {
+            this.name = name;
+            this.initializer = initializer;
+        }
+
     }
 
     public static class ExpressionStatement extends Statement {

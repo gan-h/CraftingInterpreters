@@ -7,6 +7,8 @@ abstract public class Expr {
         R visitGroupingExpr(Grouping expr);
         R visitLiteralExpr(Literal expr);
         R visitUnaryExpr(Unary expr);
+        R visitIdentifierExpr(Identifier expr);
+        R visitAssignExpr(Assign expr);
     }
 
     public abstract <R> R accept(Visitor<R> visitor);
@@ -25,6 +27,14 @@ abstract public class Expr {
             this.operator = operator;
             this.right = right;
         }
+    }
+
+    public static class Assign extends Expr {
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitAssignExpr(this);
+        }
+
     }
 
     public static class Grouping extends Expr {
@@ -47,6 +57,17 @@ abstract public class Expr {
         }
         Literal(Object value) {
             this.value = value;
+        }
+    }
+
+    public static class Identifier extends Expr {
+        public final Token identifier;
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitIdentifierExpr(this);
+        }
+        Identifier(Token value) {
+            this.identifier = value;
         }
     }
 

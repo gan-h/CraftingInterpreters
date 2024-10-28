@@ -8,11 +8,15 @@ import Java.Frontend.Expr;
 import Java.Frontend.Statement;
 import Java.Frontend.Expr.Binary;
 import Java.Frontend.Expr.Grouping;
+import Java.Frontend.Expr.Identifier;
 import Java.Frontend.Expr.Literal;
 import Java.Frontend.Expr.Unary;
 import Java.Frontend.Statement.*;
 
 public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void> {
+
+    private Environment environment = new Environment();
+
     Object print(Expr expr) {
         return expr.accept(this);
     }
@@ -140,6 +144,17 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
             default:
                 throw new InterpretError("Unary expression fall-fallthrough at switch statement");
         }
+    }
+
+    @Override
+    public Void visitVariableDeclaration(VariableDeclaration s) {
+        environment.define(s.name.lexeme, evaluate(s.initializer));
+        return null;
+    }
+
+    @Override
+    public Object visitIdentifierExpr(Identifier expr) {
+        return environment.get(expr.identifier.lexeme);
     }
     
 }
