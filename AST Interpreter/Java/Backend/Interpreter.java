@@ -30,7 +30,7 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
-        environment.define(expr.name.lexeme, value);
+        environment.assign(expr.name.lexeme, value);
         return value;
     }
 

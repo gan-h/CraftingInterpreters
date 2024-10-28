@@ -30,16 +30,16 @@ public class Environment {
     void define(String key, Object val) {
         this.map.put(key, val);
     }
-    void assign(Token name, Object value) {
-        if (map.containsKey(name.lexeme)) {
-            map.put(name.lexeme, value);
+    void assign(String name, Object value) {
+        if (map.containsKey(name)) {
+            map.put(name, value);
             return;
         }
         if(enclosing != null) {
             enclosing.assign(name, value);
             return;
         }
-        throw new InterpretError("Undefined variable '" + name.lexeme + "'.");
+        throw new InterpretError("Undefined variable '" + name + "'.");
     }
 
     
