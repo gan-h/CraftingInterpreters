@@ -6,6 +6,8 @@ import static Java.Frontend.TokenType.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import Java.Frontend.Statement.ExpressionStatement;
+import Java.Frontend.Statement.PrintStatement;
 import Java.Frontend.Error.ParseError;
 
 
@@ -56,6 +58,14 @@ public class Parser {
                 var printStatement = new PrintStatement(expression());
                 consumeOne(SEMICOLON);
                 return printStatement;
+            case LEFT_BRACE:
+                current += 1;
+                ArrayList<Statement> statements = new ArrayList<>();
+                while ((getCurrentToken().type != RIGHT_BRACE) && !isAtEnd()) {
+                    statements.add(declaration());
+                }
+                consumeOne(RIGHT_BRACE);
+                return new Statement.BlockStatement(statements);
             default:
                 var expressionStatement = new ExpressionStatement(expression());
                 consumeOne(SEMICOLON);
@@ -71,8 +81,23 @@ public class Parser {
     // Equality -> Comparison (== Comparison | != Comparison)*
     // Comparison -> 
     private Expr expression() {
-        return equality();
+        return assignment();
     }
+
+    private Expr assignment() {
+        Expr left = equality();
+        if (matchOne(EQUAL) != null) {
+            Expr value = assignment(); 
+            if (left instanceof Expr.Identifier) {
+                Token name = ((Expr.Identifier) left).identifier;
+                return new Expr.Assign(name, value);
+            }
+
+            throw new ParseError("Invalid assignment target");
+        }
+        return left;
+    }
+
     // ((3 + 2) + 3)
     private Expr equality() {
         Expr first = comparison();

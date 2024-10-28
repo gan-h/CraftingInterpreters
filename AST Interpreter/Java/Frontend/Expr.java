@@ -35,6 +35,14 @@ abstract public class Expr {
             return visitor.visitAssignExpr(this);
         }
 
+        public final Token name;
+        public final Expr value;
+
+        public Assign(Token name, Expr value) {
+            this.name = name;
+            this.value = value;
+        }
+
     }
 
     public static class Grouping extends Expr {

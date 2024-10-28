@@ -1,3 +1,4 @@
+```text
 Language Definition:
 
 program → declaration* EOF
@@ -5,7 +6,9 @@ program → declaration* EOF
 declaration → varDecl | statement;
 varDecl → "var" IDENTIFIER ( "=" expression)? ";"
 
-statement → exprStmt | printStmt
+statement → exprStmt | printStmt | block
+block → "{" declaration* "}"
+
 exprStmt → expression ";"
 printStmt → "print" expression ";"
 
@@ -17,5 +20,4 @@ term → factor ( ("-" | "+") factor)*
 factor → ("!" | "-") unary | primary
 primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER
 
-
-
+```

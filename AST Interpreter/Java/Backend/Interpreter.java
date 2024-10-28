@@ -28,6 +28,14 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
     }
 
     @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.define(expr.name.lexeme, value);
+        return value;
+    }
+
+
+    @Override
     public Void visitExpressionStatement(ExpressionStatement s) {
         evaluate(s.expression);
         return null;
@@ -155,6 +163,23 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
     @Override
     public Object visitIdentifierExpr(Identifier expr) {
         return environment.get(expr.identifier.lexeme);
+    }
+
+    @Override
+    public Void visitBlockStatement(BlockStatement block) {
+        // Executes block with new environment, afterwards backtracks to old environment.
+        Environment previous = this.environment;
+        Environment new_environment = new Environment(previous);
+        this.environment = new_environment;
+
+        try {
+            for(Statement stmt : block.statements) {
+                evaluate(stmt);
+            }
+        } finally {
+            this.environment = previous;
+        }
+        return null;
     }
     
 }

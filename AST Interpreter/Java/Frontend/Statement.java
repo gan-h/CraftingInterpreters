@@ -1,4 +1,5 @@
 package Java.Frontend;
+import java.util.ArrayList;
 
 // program -> statement* EOF
 // statement -> exprStatement | printStatement
@@ -12,6 +13,7 @@ public abstract class Statement {
         R visitPrintStatement(PrintStatement p);
         R visitExpressionStatement(ExpressionStatement s);
         R visitVariableDeclaration(VariableDeclaration s);
+        R visitBlockStatement(BlockStatement s);
     }
 
     public static class VariableDeclaration extends Statement {
@@ -39,6 +41,17 @@ public abstract class Statement {
         public Expr expression;
         ExpressionStatement(Expr expression) {
             this.expression = expression;
+        }
+    }
+
+    public static class BlockStatement extends Statement {
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBlockStatement(this);
+        }
+        public ArrayList<Statement> statements;
+        BlockStatement(ArrayList<Statement> statements) {
+            this.statements = statements;
         }
     }
 
