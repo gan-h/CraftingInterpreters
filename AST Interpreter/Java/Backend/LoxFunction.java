@@ -17,12 +17,13 @@ public class LoxFunction implements LoxCallable {
     @Override
     public Object call(Interpreter interpreter, List<Object> args) {
         if (args.size() != arity()) throw new InterpretError("Function was called with " + args.size() + " arguments, but expected " + arity());
+        Environment newEnvironment = new Environment(closure);
         for (int i = 0; i < args.size(); i++) {
-            closure.define(decl.params.get(i).lexeme, args.get(i));
+            newEnvironment.define(decl.params.get(i).lexeme, args.get(i));
         }
         Object returnValue = null;
         Environment original = interpreter.environment;
-        interpreter.environment = closure;
+        interpreter.environment = newEnvironment;
         try {
             interpreter.evaluate(decl.body);
         } catch (Return r) {
