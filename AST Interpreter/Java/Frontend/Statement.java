@@ -14,6 +14,8 @@ public abstract class Statement {
         R visitExpressionStatement(ExpressionStatement s);
         R visitVariableDeclaration(VariableDeclaration s);
         R visitBlockStatement(BlockStatement s);
+        R visitIfStatement(IfStatement s);
+        R visitWhileStatement(WhileStatement s);
     }
 
     public static class VariableDeclaration extends Statement {
@@ -63,6 +65,34 @@ public abstract class Statement {
         public Expr expression;
         PrintStatement(Expr expression) {
             this.expression = expression;
+        }
+    }
+
+    public static class WhileStatement extends Statement {
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitWhileStatement(this);
+        }
+        public Expr expression;
+        public Statement statement;
+        WhileStatement(Expr e, Statement statement) {
+            this.expression = e;
+            this.statement = statement;
+        }
+    }
+
+    public static class IfStatement extends Statement {
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitIfStatement(this);
+        }
+        public Expr condition;
+        public Statement body;
+        public Statement elseBody;
+        public IfStatement(Expr condition, Statement body, Statement elseBody) {
+            this.condition = condition;
+            this.body = body;
+            this.elseBody = elseBody;
         }
     }
 }

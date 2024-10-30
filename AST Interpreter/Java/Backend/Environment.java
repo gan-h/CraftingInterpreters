@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import Java.Backend.Error.InterpretError;
-import Java.Frontend.Token;
 
 public class Environment {
     final Environment enclosing;

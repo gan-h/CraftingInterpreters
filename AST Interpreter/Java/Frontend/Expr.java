@@ -9,6 +9,7 @@ abstract public class Expr {
         R visitUnaryExpr(Unary expr);
         R visitIdentifierExpr(Identifier expr);
         R visitAssignExpr(Assign expr);
+        R visitLogicalExpr(Logical expr);
     }
 
     public abstract <R> R accept(Visitor<R> visitor);
@@ -86,6 +87,22 @@ abstract public class Expr {
             return visitor.visitUnaryExpr(this);
         }
         Unary(Token operator, Expr right) {
+            this.operator = operator;
+            this.right = right;
+        }
+    }
+
+    public static class Logical extends Expr {
+        public final Expr left;
+        public final Expr right;
+        public final Token operator;
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitLogicalExpr(this);
+        }
+        
+        public Logical(Expr left, Token operator, Expr right) {
+            this.left = left;
             this.operator = operator;
             this.right = right;
         }

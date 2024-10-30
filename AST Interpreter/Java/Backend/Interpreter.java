@@ -1,5 +1,7 @@
 package Java.Backend;
 import static Java.Frontend.Expr.*;
+import static Java.Frontend.TokenType.AND;
+import static Java.Frontend.TokenType.OR;
 
 import java.util.List;
 
@@ -10,6 +12,7 @@ import Java.Frontend.Expr.Binary;
 import Java.Frontend.Expr.Grouping;
 import Java.Frontend.Expr.Identifier;
 import Java.Frontend.Expr.Literal;
+import Java.Frontend.Expr.Logical;
 import Java.Frontend.Expr.Unary;
 import Java.Frontend.Statement.*;
 
@@ -179,6 +182,33 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
         } finally {
             this.environment = previous;
         }
+        return null;
+    }
+
+    @Override
+    public Void visitIfStatement(IfStatement s) {
+        boolean truthy = isTruthy(evaluate(s.condition));
+        if (truthy) {
+            evaluate(s.body);
+        } else evaluate(s.elseBody);
+        return null;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Logical expr) {
+        if (expr.operator.type == AND) {
+            return isTruthy(evaluate(expr.left)) && isTruthy(evaluate(expr.right));
+        } else if (expr.operator.type == OR) {
+            return isTruthy(evaluate(expr.left)) || isTruthy(evaluate(expr.right));
+        }
+        throw new InterpretError("This should not happen");
+    }
+
+    @Override
+    public Void visitWhileStatement(WhileStatement s) {
+        while (isTruthy(evaluate(s.expression))) {
+            evaluate(s.statement);
+        } 
         return null;
     }
     

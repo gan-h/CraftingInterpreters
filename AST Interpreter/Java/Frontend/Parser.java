@@ -3,8 +3,11 @@ package Java.Frontend;
 import static Java.Frontend.Statement.*;
 import static Java.Frontend.TokenType.*;
 
+import java.beans.Expression;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sql.StatementEvent;
 
 import Java.Frontend.Statement.ExpressionStatement;
 import Java.Frontend.Statement.PrintStatement;
@@ -58,6 +61,67 @@ public class Parser {
                 var printStatement = new PrintStatement(expression());
                 consumeOne(SEMICOLON);
                 return printStatement;
+            case WHILE:
+                current += 1;
+                consumeOne(LEFT_PAREN);
+                Expr e = expression();
+                consumeOne(RIGHT_PAREN);
+                Statement s = statement();
+                return new Statement.WhileStatement(e, s);
+            case FOR:
+                current += 1;
+                // for (let i = 0; i < 10; i++) statement
+                Statement assigner = null;
+                Statement executor = null;
+                Statement incrementer = null;
+                ExpressionStatement condition = null;
+
+                consumeOne(LEFT_PAREN);
+
+                if (matchOne(SEMICOLON) != null) {
+                    // Empty statement
+                } else {
+                    if (getCurrentToken().type == VAR) {
+                        assigner = vardecl();
+                    } else {
+                        assigner = expressionStatement();
+                    }
+                }
+                
+
+                if (matchOne(SEMICOLON) != null) {
+                    condition = new Statement.ExpressionStatement(new Expr.Literal(true));
+                } else {
+                    condition = (ExpressionStatement) expressionStatement();
+                }
+                
+                if (matchOne(RIGHT_PAREN) != null) {
+                    // Empty increment 
+                } else {
+                    incrementer = new Statement.ExpressionStatement(expression());
+                    consumeOne(RIGHT_PAREN);
+                }
+
+                executor = statement();
+                
+                ArrayList<Statement> outerBlockStatements = new ArrayList<>();
+                ArrayList<Statement> whileBlockStatements = new ArrayList<>();
+                if (executor != null) whileBlockStatements.add(executor);
+                if (incrementer != null) whileBlockStatements.add(incrementer);
+                if (assigner != null) outerBlockStatements.add(assigner);
+                outerBlockStatements.add(new Statement.WhileStatement(condition.expression, new Statement.BlockStatement(whileBlockStatements)));
+                return new Statement.BlockStatement(outerBlockStatements);
+            case IF:
+                current += 1;
+                consumeOne(LEFT_PAREN);
+                Expr ifCondition = expression();
+                consumeOne(RIGHT_PAREN);
+                Statement body = statement();
+                if (null != matchOne(ELSE)) {
+                    Statement elseBody = statement();
+                    return new Statement.IfStatement(ifCondition, body, elseBody);
+                }
+                return new Statement.IfStatement(ifCondition, body, null);
             case LEFT_BRACE:
                 current += 1;
                 ArrayList<Statement> statements = new ArrayList<>();
@@ -67,12 +131,16 @@ public class Parser {
                 consumeOne(RIGHT_BRACE);
                 return new Statement.BlockStatement(statements);
             default:
-                var expressionStatement = new ExpressionStatement(expression());
-                consumeOne(SEMICOLON);
-                return expressionStatement;
+                return expressionStatement();
         }
     }
+    
 
+    private Statement   expressionStatement() {
+        var expressionStatement = new ExpressionStatement(expression());
+        consumeOne(SEMICOLON);
+        return expressionStatement;
+    }
     
 
 
@@ -85,15 +153,35 @@ public class Parser {
     }
 
     private Expr assignment() {
-        Expr left = equality();
+        Expr left = logicOr();
         if (matchOne(EQUAL) != null) {
-            Expr value = assignment(); 
+            Expr value = logicOr(); 
             if (left instanceof Expr.Identifier) {
                 Token name = ((Expr.Identifier) left).identifier;
                 return new Expr.Assign(name, value);
             }
 
             throw new ParseError("Invalid assignment target");
+        }
+        return left;
+    }
+
+    private Expr logicOr() {
+        Expr left = logicAnd();
+        Token op = null;
+        while ((op = matchOne(OR)) != null) {
+            Expr right = logicAnd();
+            left = new Expr.Logical(left, op, right);
+        }
+        return left;
+    }
+
+    private Expr logicAnd() {
+        Expr left = equality();
+        Token op = null;
+        while ((op = matchOne(AND)) != null) {
+            Expr right = equality();
+            left = new Expr.Logical(left, op, right);
         }
         return left;
     }
