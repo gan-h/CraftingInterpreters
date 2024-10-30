@@ -1,7 +1,17 @@
-for (var i = 0; i < 5; i = i + 1) {
-    for (var k = 0; k < 5; k = k + 1) {
+fun makeCounter() {
+    var i = 0;
+    fun count() {
+        i = i + 1;
         print i;
-        print k;
-        print " ";
     }
+    return count;
+}
+var counter = makeCounter();
+var secondCounter = makeCounter();
+counter();
+secondCounter();
+
+for (var i = 0; i < 10; i = i + 1) {
+    secondCounter();
+    counter();
 }

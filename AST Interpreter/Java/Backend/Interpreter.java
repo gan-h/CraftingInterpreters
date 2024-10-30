@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Java.Backend.Error.InterpretError;
+import Java.Backend.Error.Return;
 import Java.Frontend.Expr;
 import Java.Frontend.Statement;
 import Java.Frontend.Expr.Binary;
@@ -20,7 +21,7 @@ import Java.Frontend.Statement.*;
 
 public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void> {
 
-    private Environment environment = new Environment();
+    public Environment environment = new Environment();
 
     public Interpreter() {
         environment.define("clock", new LoxCallable() {
@@ -113,6 +114,10 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
 
         switch (expr.operator.type) {
             case PLUS:
+                if (left instanceof String && right instanceof Double || 
+                    right instanceof String && left instanceof Double) {
+                    return left + "" + right;
+                }
                 if (left instanceof Double && right instanceof Double) {
                     return (double)left + (double)right;
                 }
@@ -214,7 +219,9 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
         boolean truthy = isTruthy(evaluate(s.condition));
         if (truthy) {
             evaluate(s.body);
-        } else evaluate(s.elseBody);
+        } else if(s.elseBody != null) {
+            evaluate(s.elseBody);
+        };
         return null;
     }
 
@@ -243,9 +250,22 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
         for (Expr argument : expr.argumentList) {
             arguments.add(evaluate(argument));
         }
-        LoxCallable function = (LoxCallable) function;
+        LoxCallable callable = (LoxCallable) function;
         
-        return function.call(this, arguments);
+        return callable.call(this, arguments);
+    }
+
+
+    @Override
+    public Void visitFuncDeclStatement(FuncDecl funcDecl) {
+        environment.define(funcDecl.name.lexeme, new LoxFunction(funcDecl, environment));
+        return null;
+    }
+
+
+    @Override
+    public Void visitReturnStatement(ReturnStatement returnStatement) {
+        throw new Return(evaluate(returnStatement.expression));
     }
     
 }

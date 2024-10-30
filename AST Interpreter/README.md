@@ -3,10 +3,13 @@ Language Definition:
 
 program → declaration* EOF
 
-declaration → varDecl | statement;
+declaration → varDecl | funDecl | statement;
 varDecl → "var" IDENTIFIER ( "=" expression)? ";"
+funDecl → "function" function
+function → IDENTIFIER "(" parameters? ")" block;
+parameters → IDENTIFIER ("," IDENTIFIER)* 
 
-statement → exprStmt | printStmt | block | ifStmt | whileStmt
+statement → exprStmt | printStmt | block | ifStmt | whileStmt | returnStmt
 block → "{" declaration* "}"
 
 ifStmt → "if" "(" expression ")" statement ( "else" statement )? 

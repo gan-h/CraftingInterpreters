@@ -33,7 +33,36 @@ public class Parser {
         if(getCurrentToken().type == VAR) {
             return vardecl();
         }
+        if(getCurrentToken().type == FUN) {
+            return funcdecl();
+        }
         return statement();
+    }
+
+    public Statement funcdecl() {
+        consumeOne(FUN);
+        return function();
+    }
+
+    public Statement function() {
+        Token functionName = consumeOne(IDENTIFIER);
+        consumeOne(LEFT_PAREN);
+        List<Token> parameters = functionParameters();
+        consumeOne(RIGHT_PAREN);
+        return new Statement.FuncDecl(functionName, parameters, ((Statement.BlockStatement) block()).statements);
+    }
+
+    private List<Token> functionParameters() {
+        ArrayList<Token> tokens = new ArrayList<>();
+        while (true) {
+            // Checks if we are the end of the argument list
+            if (check(RIGHT_PAREN)) break;
+            tokens.add(consumeOne(IDENTIFIER));
+            // Not at the argument list's end implies a comma
+            if (check(RIGHT_PAREN)) break;
+            consumeOne(COMMA);
+        }
+        return tokens;
     }
 
     public Statement vardecl() {
@@ -65,6 +94,11 @@ public class Parser {
                 consumeOne(RIGHT_PAREN);
                 Statement s = statement();
                 return new Statement.WhileStatement(e, s);
+            case RETURN:
+                current += 1;
+                Expr returnExpression = expression();
+                consumeOne(SEMICOLON);
+                return new Statement.ReturnStatement(returnExpression);
             case FOR:
                 current += 1;
                 // for (let i = 0; i < 10; i++) statement
@@ -120,16 +154,20 @@ public class Parser {
                 }
                 return new Statement.IfStatement(ifCondition, body, null);
             case LEFT_BRACE:
-                current += 1;
-                ArrayList<Statement> statements = new ArrayList<>();
-                while ((getCurrentToken().type != RIGHT_BRACE) && !isAtEnd()) {
-                    statements.add(declaration());
-                }
-                consumeOne(RIGHT_BRACE);
-                return new Statement.BlockStatement(statements);
+                return block();
             default:
                 return expressionStatement();
         }
+    }
+
+    private Statement block() {
+        consumeOne(LEFT_BRACE);
+        ArrayList<Statement> statements = new ArrayList<>();
+        while ((getCurrentToken().type != RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+        consumeOne(RIGHT_BRACE);
+        return new Statement.BlockStatement(statements);
     }
     
 

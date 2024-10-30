@@ -1,5 +1,6 @@
 package Java.Frontend;
 import java.util.ArrayList;
+import java.util.List;
 
 // program -> statement* EOF
 // statement -> exprStatement | printStatement
@@ -16,6 +17,8 @@ public abstract class Statement {
         R visitBlockStatement(BlockStatement s);
         R visitIfStatement(IfStatement s);
         R visitWhileStatement(WhileStatement s);
+        R visitFuncDeclStatement(FuncDecl funcDecl);
+        R visitReturnStatement(ReturnStatement returnStatement);
     }
 
     public static class VariableDeclaration extends Statement {
@@ -42,6 +45,17 @@ public abstract class Statement {
         }
         public Expr expression;
         ExpressionStatement(Expr expression) {
+            this.expression = expression;
+        }
+    }
+
+    public static class ReturnStatement extends Statement {
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitReturnStatement(this);
+        }
+        public Expr expression;
+        public ReturnStatement(Expr expression) {
             this.expression = expression;
         }
     }
@@ -93,6 +107,22 @@ public abstract class Statement {
             this.condition = condition;
             this.body = body;
             this.elseBody = elseBody;
+        }
+    }
+
+    public static class FuncDecl extends Statement {
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitFuncDeclStatement(this);
+        }
+        public Token name;
+        public List<Token> params;
+        public List<Statement> body;
+
+        public FuncDecl(Token name, List<Token> params, List<Statement> body) {
+            this.name = name;
+            this.params = params;
+            this.body = body;
         }
     }
 }
