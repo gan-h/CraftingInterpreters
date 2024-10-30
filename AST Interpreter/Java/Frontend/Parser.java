@@ -1,13 +1,10 @@
 package Java.Frontend;
 
-import static Java.Frontend.Statement.*;
 import static Java.Frontend.TokenType.*;
 
-import java.beans.Expression;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.StatementEvent;
 
 import Java.Frontend.Statement.ExpressionStatement;
 import Java.Frontend.Statement.PrintStatement;
@@ -231,8 +228,30 @@ public class Parser {
         if (matchOne(TokenType.BANG, TokenType.MINUS) != null) {
             return new Expr.Unary(previous(), unary());
         } else {
-            return primary();
+            return call();
         }
+    }
+
+    private Expr call() {
+        Expr primaryExpr = primary();
+        while (matchOne(LEFT_PAREN) != null) {
+            primaryExpr = new Expr.Call(primaryExpr, arguments());
+            consumeOne(RIGHT_PAREN);
+        }
+        return primaryExpr;
+    }
+
+    private List<Expr> arguments() {
+        List<Expr> argumentList = new ArrayList<>();
+        while (true) {
+            // Checks if we are the end of the argument list
+            if (check(RIGHT_PAREN)) break;
+            argumentList.add(expression());
+            // Not at the argument list's end implies a comma
+            if (check(RIGHT_PAREN)) break;
+            consumeOne(COMMA);
+        }
+        return argumentList;
     }
 
     private Expr primary() {
@@ -273,6 +292,14 @@ public class Parser {
 
     private Token getCurrentToken() {
         return tokens.get(current);
+    }
+
+    private boolean check(TokenType t) {
+        if (matchOne(t) != null) {
+            current -= 1;
+            return true;
+        }
+        return false;
     }
 
     private Token matchOne(TokenType... tokens) {

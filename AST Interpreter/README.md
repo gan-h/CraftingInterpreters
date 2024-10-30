@@ -22,7 +22,10 @@ logic_and → equality ("and" equality)*
 equality → comparison ( ("!=" | "==") comparison)*
 equality → term ( (">" | ">=" | "<" | "<=") term)*
 term → factor ( ("-" | "+") factor)*
-factor → ("!" | "-") unary | primary
+factor → unary ( ("*" | "/") unary)*
+unary → ("!" | "-") unary | call
+call → primary (   "("  arguments?   ")"  )*
+arguments → expression ("," expression)* 
 primary → NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" | IDENTIFIER
 
 ```

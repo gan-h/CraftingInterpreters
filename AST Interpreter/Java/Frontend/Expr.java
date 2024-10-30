@@ -1,5 +1,7 @@
 package Java.Frontend;
 
+import java.util.List;
+
 abstract public class Expr {
 
     public static interface Visitor<R> {
@@ -10,6 +12,7 @@ abstract public class Expr {
         R visitIdentifierExpr(Identifier expr);
         R visitAssignExpr(Assign expr);
         R visitLogicalExpr(Logical expr);
+        R visitCallExpr(Call call);
     }
 
     public abstract <R> R accept(Visitor<R> visitor);
@@ -27,6 +30,20 @@ abstract public class Expr {
             this.left = left;
             this.operator = operator;
             this.right = right;
+        }
+    }
+
+    public static class Call extends Expr {
+        public final Expr function;
+        public final List<Expr> argumentList;
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitCallExpr(this);
+        }
+
+        public Call(Expr function, List<Expr> argumentList) {
+            this.function = function;
+            this.argumentList = argumentList;
         }
     }
 

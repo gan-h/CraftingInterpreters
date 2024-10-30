@@ -3,12 +3,14 @@ import static Java.Frontend.Expr.*;
 import static Java.Frontend.TokenType.AND;
 import static Java.Frontend.TokenType.OR;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import Java.Backend.Error.InterpretError;
 import Java.Frontend.Expr;
 import Java.Frontend.Statement;
 import Java.Frontend.Expr.Binary;
+import Java.Frontend.Expr.Call;
 import Java.Frontend.Expr.Grouping;
 import Java.Frontend.Expr.Identifier;
 import Java.Frontend.Expr.Literal;
@@ -19,6 +21,28 @@ import Java.Frontend.Statement.*;
 public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void> {
 
     private Environment environment = new Environment();
+
+    public Interpreter() {
+        environment.define("clock", new LoxCallable() {
+
+            @Override
+            public int arity() {
+                return 0;
+            }
+
+            @Override
+            public Object call(Interpreter interpreter, List<Object> args) {
+                return (double) System.currentTimeMillis() / 1000.0;
+            }
+
+            @Override
+            public String toString() {
+                return "<native clock function>";
+            }
+            
+        });
+    }
+
 
     Object print(Expr expr) {
         return expr.accept(this);
@@ -210,6 +234,18 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
             evaluate(s.statement);
         } 
         return null;
+    }
+
+    @Override
+    public Object visitCallExpr(Call expr) {
+        Object function = evaluate(expr.function);
+        List<Object> arguments = new ArrayList<>();
+        for (Expr argument : expr.argumentList) {
+            arguments.add(evaluate(argument));
+        }
+        LoxCallable function = (LoxCallable) function;
+        
+        return function.call(this, arguments);
     }
     
 }
