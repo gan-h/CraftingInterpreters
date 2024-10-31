@@ -33,6 +33,9 @@ public class Parser {
         if(getCurrentToken().type == VAR) {
             return vardecl();
         }
+        if(getCurrentToken().type == CLASS) {
+            return classdecl();
+        }
         if(getCurrentToken().type == FUN) {
             return funcdecl();
         }
@@ -49,7 +52,19 @@ public class Parser {
         consumeOne(LEFT_PAREN);
         List<Token> parameters = functionParameters();
         consumeOne(RIGHT_PAREN);
-        return new Statement.FuncDecl(functionName, parameters, ((Statement.BlockStatement) block()).statements);
+        return new Statement.Function(functionName, parameters, ((Statement.BlockStatement) block()).statements);
+    }
+
+    private Statement classdecl() {
+        consumeOne(CLASS);
+        Token name = consumeOne(IDENTIFIER);
+        consumeOne(LEFT_BRACE);
+        List<Statement.Function> methods = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            methods.add((Statement.Function) function());
+        }
+        consumeOne(RIGHT_BRACE);
+        return new Statement.ClassDecl(name, methods);
     }
 
     private List<Token> functionParameters() {

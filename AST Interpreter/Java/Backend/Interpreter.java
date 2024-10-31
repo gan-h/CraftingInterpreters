@@ -257,7 +257,7 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
 
 
     @Override
-    public Void visitFuncDeclStatement(FuncDecl funcDecl) {
+    public Void visitFunctionStatement(Function funcDecl) {
         environment.define(funcDecl.name.lexeme, new LoxFunction(funcDecl, environment));
         return null;
     }
@@ -266,6 +266,15 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
     @Override
     public Void visitReturnStatement(ReturnStatement returnStatement) {
         throw new Return(evaluate(returnStatement.expression));
+    }
+
+
+    @Override
+    public Void visitClassDecl(ClassDecl classDecl) {
+       environment.define(classDecl.name.lexeme, null);
+       LoxClass klass = new LoxClass(classDecl.name.lexeme);
+       environment.assign(classDecl.name.lexeme, klass);
+       return null;
     }
     
 }

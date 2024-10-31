@@ -1,17 +1,7 @@
-var programStartTime = clock();
-
-function fibFuncFactory(n, baseCase) {
-    function fib(n) {
-        if (n == 1 or n == 2) return baseCase;
-        else return fib(n-1) + fib(n-2);
+class Bagel {
+    Bagel() {
+        print "WTF";
     }
-    function executeFib() {
-        return fib(n);
-    }
-    return executeFib;
 }
 
-var findAnswer = fibFuncFactory(30, 1);
-print "The 30th fibonacci number is... " + findAnswer();
-var programEndTime = clock();
-print "Executed in " + (programEndTime - programStartTime) + " seconds";
+print Bagel();

@@ -17,8 +17,9 @@ public abstract class Statement {
         R visitBlockStatement(BlockStatement s);
         R visitIfStatement(IfStatement s);
         R visitWhileStatement(WhileStatement s);
-        R visitFuncDeclStatement(FuncDecl funcDecl);
+        R visitFunctionStatement(Function funcDecl);
         R visitReturnStatement(ReturnStatement returnStatement);
+        R visitClassDecl(ClassDecl classDecl);
     }
 
     public static class VariableDeclaration extends Statement {
@@ -110,19 +111,33 @@ public abstract class Statement {
         }
     }
 
-    public static class FuncDecl extends Statement {
+    public static class Function extends Statement {
         @Override
         public <R> R accept(Visitor<R> visitor) {
-            return visitor.visitFuncDeclStatement(this);
+            return visitor.visitFunctionStatement(this);
         }
         public Token name;
         public List<Token> params;
         public List<Statement> body;
 
-        public FuncDecl(Token name, List<Token> params, List<Statement> body) {
+        public Function(Token name, List<Token> params, List<Statement> body) {
             this.name = name;
             this.params = params;
             this.body = body;
+        }
+    }
+
+    public static class ClassDecl extends Statement {
+        @Override
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitClassDecl(this);
+        }
+        public Token name;
+        public List<Statement.Function> methods;
+
+        public ClassDecl(Token name, List<Statement.Function> methods) {
+            this.name = name;
+            this.methods = methods;
         }
     }
 }

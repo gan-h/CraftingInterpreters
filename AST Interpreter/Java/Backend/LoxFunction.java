@@ -7,7 +7,7 @@ import Java.Backend.Error.Return;
 import Java.Frontend.Statement;
 
 public class LoxFunction implements LoxCallable {
-    private final Statement.FuncDecl decl;
+    private final Statement.Function decl;
     private final Environment closure;
     @Override
     public int arity() {
@@ -40,7 +40,7 @@ public class LoxFunction implements LoxCallable {
     }
 
 
-    public LoxFunction(Statement.FuncDecl decl, Environment outer) {
+    public LoxFunction(Statement.Function decl, Environment outer) {
         this.decl = decl;
         this.closure = new Environment(outer);
     }
