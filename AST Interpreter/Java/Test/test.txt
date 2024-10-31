@@ -1,11 +1,11 @@
 var programStartTime = clock();
 
-fun fibFuncFactory(n, baseCase) {
-    fun fib(n) {
+function fibFuncFactory(n, baseCase) {
+    function fib(n) {
         if (n == 1 or n == 2) return baseCase;
         else return fib(n-1) + fib(n-2);
     }
-    fun executeFib() {
+    function executeFib() {
         return fib(n);
     }
     return executeFib;
