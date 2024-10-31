@@ -4,7 +4,9 @@ import static Java.Frontend.TokenType.AND;
 import static Java.Frontend.TokenType.OR;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import Java.Backend.Error.InterpretError;
 import Java.Backend.Error.Return;
@@ -12,10 +14,12 @@ import Java.Frontend.Expr;
 import Java.Frontend.Statement;
 import Java.Frontend.Expr.Binary;
 import Java.Frontend.Expr.Call;
+import Java.Frontend.Expr.Get;
 import Java.Frontend.Expr.Grouping;
 import Java.Frontend.Expr.Identifier;
 import Java.Frontend.Expr.Literal;
 import Java.Frontend.Expr.Logical;
+import Java.Frontend.Expr.Set;
 import Java.Frontend.Expr.Unary;
 import Java.Frontend.Statement.*;
 
@@ -271,10 +275,40 @@ public class Interpreter implements Expr.Visitor<Object>, Statement.Visitor<Void
 
     @Override
     public Void visitClassDecl(ClassDecl classDecl) {
-       environment.define(classDecl.name.lexeme, null);
-       LoxClass klass = new LoxClass(classDecl.name.lexeme);
-       environment.assign(classDecl.name.lexeme, klass);
-       return null;
+        environment.define(classDecl.name.lexeme, null);
+        Map<String, LoxFunction> methods = new HashMap<String, LoxFunction>();
+        for (var method: classDecl.methods) {
+            LoxFunction function = new LoxFunction(method, environment);
+            methods.put(method.name.lexeme, function);
+        }
+        LoxClass klass = new LoxClass(classDecl.name.lexeme, methods);
+        environment.assign(classDecl.name.lexeme, klass);
+        return null;
+    }
+
+
+    @Override
+    public Object visitGetExpr(Get get) {
+        Object o = evaluate(get.object);
+        String name = get.name.lexeme;
+        if (o instanceof LoxInstance) {
+            return ((LoxInstance)o).get(name);
+        } else {
+            throw new InterpretError("Program tried to access " + name + " on a " + o);
+        }
+    }
+
+
+    @Override
+    public Object visitSetExpr(Set set) {
+        Object o = evaluate(set.object);
+        if (o instanceof LoxInstance) {
+            Object value = evaluate(set.value);
+            ((LoxInstance) o).set(set.name.lexeme, value);
+            return value;
+        } else {
+            throw new InterpretError("Tried to set a field on a non-object");
+        }
     }
     
 }

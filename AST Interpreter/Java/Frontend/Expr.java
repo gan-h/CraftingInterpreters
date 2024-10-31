@@ -13,6 +13,8 @@ abstract public class Expr {
         R visitAssignExpr(Assign expr);
         R visitLogicalExpr(Logical expr);
         R visitCallExpr(Call call);
+        R visitGetExpr(Get get);
+        R visitSetExpr(Set set);
     }
 
     public abstract <R> R accept(Visitor<R> visitor);
@@ -122,6 +124,36 @@ abstract public class Expr {
             this.left = left;
             this.operator = operator;
             this.right = right;
+        }
+    }
+
+    public static class Get extends Expr {
+        public final Expr object;
+        public final Token name;
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitGetExpr(this);
+        }
+        
+        public Get(Expr object, Token name) {
+            this.object = object;
+            this.name = name;
+        }
+    }
+
+    public static class Set extends Expr {
+        public final Expr object;
+        public final Token name;
+        public final Expr value;
+
+        public <R> R accept(Visitor<R> visitor) {
+            return visitor.visitSetExpr(this);
+        }
+        
+        public Set(Expr object, Token name, Expr value) {
+            this.object = object;
+            this.name = name;
+            this.value = value;
         }
     }
 }

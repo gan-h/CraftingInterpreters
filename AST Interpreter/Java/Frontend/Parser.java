@@ -209,6 +209,10 @@ public class Parser {
             if (left instanceof Expr.Identifier) {
                 Token name = ((Expr.Identifier) left).identifier;
                 return new Expr.Assign(name, value);
+            } else if (left instanceof Expr.Get) {
+                Expr.Get get = (Expr.Get) left;
+                return new Expr.Set(get.object, get.name, value);
+
             }
 
             throw new ParseError("Invalid assignment target");
@@ -287,9 +291,16 @@ public class Parser {
 
     private Expr call() {
         Expr primaryExpr = primary();
-        while (matchOne(LEFT_PAREN) != null) {
-            primaryExpr = new Expr.Call(primaryExpr, arguments());
-            consumeOne(RIGHT_PAREN);
+        Token matchedToken = null;
+        while ((matchedToken = matchOne(LEFT_PAREN, DOT)) != null) {
+            if (matchedToken.type == LEFT_PAREN) {
+                primaryExpr = new Expr.Call(primaryExpr, arguments());
+                consumeOne(RIGHT_PAREN);
+            } else {
+                // DOT
+                primaryExpr = new Expr.Get(primaryExpr, consumeOne(IDENTIFIER));
+            }
+
         }
         return primaryExpr;
     }
